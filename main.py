@@ -1,6 +1,6 @@
 import tkinter as tk
 import tkinter.font as font
-from PIL import Image, ImageTk, ImageOps, ImageDraw
+from PIL import Image, ImageTk, ImageOps
 from threading import Thread
 from in_out import in_out  # Assuming these are your OpenCV scripts
 from motion import noise
@@ -50,15 +50,6 @@ def create_rounded_button(parent, text, image, command, fg_color, hover_color):
     btn.bind("<Leave>", on_leave)
     return btn
 
-# Function to create a rounded image
-def make_rounded_image(image_path, size=(150, 150)):
-    img = Image.open(image_path).resize(size, Image.LANCZOS)
-    mask = Image.new('L', size, 0)
-    draw = ImageDraw.Draw(mask)
-    draw.ellipse((0, 0) + size, fill=255)
-    img.putalpha(mask)
-    return ImageTk.PhotoImage(img)
-
 # Function to open a pop-up window with buttons
 def open_popup():
     popup = tk.Toplevel(window)
@@ -95,12 +86,23 @@ frame1 = tk.Frame(window, bg='black')
 label_title = tk.Label(frame1, text="Camera Analysis", fg='lime', bg='black')
 label_font = font.Font(size=35, weight='bold', family='Helvetica')
 label_title['font'] = label_font
-label_title.grid(pady=(10, 10), column=2)   
+label_title.grid(pady=(10, 10), column=2)
 
 # Load and resize icons
-icon = make_rounded_image('icons/cam.png')
+icon = Image.open('icons/cam.png').resize((150, 150), Image.LANCZOS)
+icon = ImageTk.PhotoImage(icon)
 label_icon = tk.Label(frame1, image=icon, bg='black')
 label_icon.grid(row=1, pady=(5, 10), column=2)
+
+# Add hover effect for cam.png
+def on_enter(e):
+    label_icon['bg'] = 'gray'
+
+def on_leave(e):
+    label_icon['bg'] = 'black'
+
+label_icon.bind("<Enter>", on_enter)
+label_icon.bind("<Leave>", on_leave)
 label_icon.bind("<Button-1>", lambda e: open_popup())  # Bind click event to open popup
 
 # Load button icons and resize
