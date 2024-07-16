@@ -1,0 +1,7 @@
+# Ignore video files in the recordings folder
+/recordings/*.mp4
+/recordings/*.avi
+/recordings/*.mov
+
+# Or to ignore all files in the recordings folder
+/recordings/*
