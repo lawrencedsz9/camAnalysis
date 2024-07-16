@@ -50,27 +50,44 @@ def create_rounded_button(parent, text, image, command, fg_color, hover_color):
     btn.bind("<Leave>", on_leave)
     return btn
 
-# Function to open a pop-up window with buttons
+# Function to open a pop-up window with buttons on the left
 def open_popup():
     popup = tk.Toplevel(window)
     popup.title("Camera Controls")
     popup.geometry("400x300")
     popup.configure(bg='black')
-    
-    btn2 = create_rounded_button(popup, 'Spot', btn2_image, start_rect_noise, 'blue', 'darkblue')
+
+    canvas = tk.Canvas(popup, bg='black')
+    scrollbar = tk.Scrollbar(popup, orient='vertical', command=canvas.yview)
+    scrollable_frame = tk.Frame(canvas, bg='black')
+
+    scrollable_frame.bind(
+        "<Configure>",
+        lambda e: canvas.configure(
+            scrollregion=canvas.bbox("all")
+        )
+    )
+
+    canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+    canvas.configure(yscrollcommand=scrollbar.set)
+
+    btn2 = create_rounded_button(scrollable_frame, 'Spot', btn2_image, start_rect_noise, 'blue', 'darkblue')
     btn2.pack(pady=10)
 
-    btn3 = create_rounded_button(popup, 'Security', btn3_image, start_in_out, 'red', 'darkred')
+    btn3 = create_rounded_button(scrollable_frame, 'Security', btn3_image, start_in_out, 'red', 'darkred')
     btn3.pack(pady=10)
 
-    btn4 = create_rounded_button(popup, 'Record', btn4_image, start_record, 'purple', 'darkpurple')
+    btn4 = create_rounded_button(scrollable_frame, 'Record', btn4_image, start_record, 'purple', 'darkpurple')
     btn4.pack(pady=10)
 
-    btn6 = create_rounded_button(popup, 'Monitor', btn6_image, start_noise, 'orange', 'darkorange')
+    btn6 = create_rounded_button(scrollable_frame, 'Monitor', btn6_image, start_noise, 'orange', 'darkorange')
     btn6.pack(pady=10)
 
-    btn5 = create_rounded_button(popup, 'Exit', btn5_image, popup.destroy, 'black', 'gray')
+    btn5 = create_rounded_button(scrollable_frame, 'Exit', btn5_image, popup.destroy, 'black', 'gray')
     btn5.pack(pady=10)
+
+    canvas.pack(side='left', fill='both', expand=True)
+    scrollbar.pack(side='right', fill='y')
 
 # Create the main window
 window = tk.Tk()
