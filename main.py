@@ -91,7 +91,7 @@ def open_popup():
 
 # Create the main window
 window = tk.Tk()
-window.title("CCTV - Spy Theme")
+window.title("Cam-Sys")
 window.iconphoto(False, tk.PhotoImage(file='mn.png'))
 window.geometry('1080x760')
 window.configure(bg='black')  # Set the background color to black
