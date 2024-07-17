@@ -2,15 +2,33 @@ import tkinter as tk
 import tkinter.font as font
 from PIL import Image, ImageTk, ImageOps
 from threading import Thread
-import sqlite3  # Import sqlite3 for database operations
-from in_out import in_out  # Assuming these are your OpenCV scripts
+import sqlite3
+from scroll import create_rounded_button, open_popup
+from in_out import in_out
 from motion import noise
 from rect_noise import rect_noise
 from record import record
 
 # Function to connect to the database
 def connect_db():
-    return sqlite3.connect('cctv_data.db')
+    return sqlite3.connect('setup_database.db')
+
+# Function to create the recordings table if it doesn't exist
+def create_table():
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS recordings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            timestamp TEXT NOT NULL
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+# Call create_table function to ensure the table is created
+create_table()
 
 # Function to insert a new recording into the database
 def insert_recording(name, timestamp):
@@ -66,65 +84,9 @@ def start_rect_noise():
     except Exception as e:
         print(f"Error starting rectangle noise detection: {e}")
 
-# Function to create a circular button
-def create_rounded_button(parent, text, image, command, fg_color, hover_color, width):
-    def on_enter(e):
-        btn['background'] = hover_color
-
-    def on_leave(e):
-        btn['background'] = fg_color
-
-    btn = tk.Button(parent, text=text, image=image, compound='left', command=command, 
-                    font=font.Font(size=15, weight='bold'), fg='white', bg=fg_color, 
-                    relief='flat', bd=0, highlightthickness=0, width=width)
-    btn.bind("<Enter>", on_enter)
-    btn.bind("<Leave>", on_leave)
-    return btn
-
-# Function to open a pop-up window with buttons on the left
-def open_popup():
-    popup = tk.Toplevel(window)
-    popup.title("Camera Controls")
-    popup.geometry("400x300")
-    popup.configure(bg='black')
-
-    canvas = tk.Canvas(popup, bg='black')
-    scrollbar = tk.Scrollbar(popup, orient='vertical', command=canvas.yview)
-    scrollable_frame = tk.Frame(canvas, bg='black')
-
-    scrollable_frame.bind(
-        "<Configure>",
-        lambda e: canvas.configure(
-            scrollregion=canvas.bbox("all")
-        )
-    )
-
-    canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
-    canvas.configure(yscrollcommand=scrollbar.set)
-
-    btn_width = 20  # Set a fixed width for all buttons
-
-    btn2 = create_rounded_button(scrollable_frame, 'Spot', btn2_image, start_rect_noise, 'blue', 'darkblue', btn_width)
-    btn2.pack(pady=10)
-
-    btn3 = create_rounded_button(scrollable_frame, 'Security', btn3_image, start_in_out, 'red', 'darkred', btn_width)
-    btn3.pack(pady=10)
-
-    btn4 = create_rounded_button(scrollable_frame, 'Record', btn4_image, start_record, 'purple', 'darkpurple', btn_width)
-    btn4.pack(pady=10)
-
-    btn6 = create_rounded_button(scrollable_frame, 'Monitor', btn6_image, start_noise, 'orange', 'darkorange', btn_width)
-    btn6.pack(pady=10)
-
-    btn5 = create_rounded_button(scrollable_frame, 'Exit', btn5_image, popup.destroy, 'black', 'gray', btn_width)
-    btn5.pack(pady=10)
-
-    canvas.pack(side='left', fill='both', expand=True)
-    scrollbar.pack(side='right', fill='y')
-
 # Create the main window
 window = tk.Tk()
-window.title("CCTV - Spy Theme")
+window.title("Cam-Sys")
 window.iconphoto(False, tk.PhotoImage(file='mn.png'))
 window.geometry('1080x760')
 window.configure(bg='black')  # Set the background color to black
@@ -153,7 +115,8 @@ def on_leave(e):
 
 label_icon.bind("<Enter>", on_enter)
 label_icon.bind("<Leave>", on_leave)
-label_icon.bind("<Button-1>", lambda e: open_popup())  # Bind click event to open popup
+label_icon.bind("<Button-1>", lambda e: open_popup(window, btn2_image, btn3_image, btn4_image, btn5_image, btn6_image,
+                                                   start_rect_noise, start_in_out, start_record, start_noise))
 
 # Load button icons and resize
 def load_button_image(image_path):

@@ -23,7 +23,7 @@ def record():
 
         out.write(frame)  # Write the frame to the output file
 
-        cv2.imshow("Recording (Press 'F' to stop)", frame)  # Display the frame
+        cv2.imshow("Recording", frame)  # Display the frame
 
         # Check for 'f' key press to stop recording
         if cv2.waitKey(1) & 0xFF == ord('f'):
