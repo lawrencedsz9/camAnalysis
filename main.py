@@ -2,10 +2,40 @@ import tkinter as tk
 import tkinter.font as font
 from PIL import Image, ImageTk, ImageOps
 from threading import Thread
+import sqlite3  # Import sqlite3 for database operations
 from in_out import in_out  # Assuming these are your OpenCV scripts
 from motion import noise
 from rect_noise import rect_noise
 from record import record
+
+# Function to connect to the database
+def connect_db():
+    return sqlite3.connect('cctv_data.db')
+
+# Function to insert a new recording into the database
+def insert_recording(name, timestamp):
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO recordings (name, timestamp) VALUES (?, ?)', (name, timestamp))
+    conn.commit()
+    conn.close()
+
+# Function to fetch all recordings from the database
+def fetch_recordings():
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM recordings')
+    recordings = cursor.fetchall()
+    conn.close()
+    return recordings
+
+# Function to delete a recording from the database
+def delete_recording(recording_id):
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM recordings WHERE id = ?', (recording_id,))
+    conn.commit()
+    conn.close()
 
 # Function to start OpenCV capture for in_out functionality
 def start_in_out():
@@ -25,6 +55,7 @@ def start_noise():
 def start_record():
     try:
         Thread(target=record).start()
+        insert_recording('Recording Name', '2024-07-16 12:00:00')  # Example of inserting a recording
     except Exception as e:
         print(f"Error starting recording: {e}")
 
@@ -36,7 +67,7 @@ def start_rect_noise():
         print(f"Error starting rectangle noise detection: {e}")
 
 # Function to create a circular button
-def create_rounded_button(parent, text, image, command, fg_color, hover_color):
+def create_rounded_button(parent, text, image, command, fg_color, hover_color, width):
     def on_enter(e):
         btn['background'] = hover_color
 
@@ -45,7 +76,7 @@ def create_rounded_button(parent, text, image, command, fg_color, hover_color):
 
     btn = tk.Button(parent, text=text, image=image, compound='left', command=command, 
                     font=font.Font(size=15, weight='bold'), fg='white', bg=fg_color, 
-                    relief='flat', bd=0, highlightthickness=0)
+                    relief='flat', bd=0, highlightthickness=0, width=width)
     btn.bind("<Enter>", on_enter)
     btn.bind("<Leave>", on_leave)
     return btn
@@ -71,19 +102,21 @@ def open_popup():
     canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
     canvas.configure(yscrollcommand=scrollbar.set)
 
-    btn2 = create_rounded_button(scrollable_frame, 'Spot', btn2_image, start_rect_noise, 'blue', 'darkblue')
+    btn_width = 20  # Set a fixed width for all buttons
+
+    btn2 = create_rounded_button(scrollable_frame, 'Spot', btn2_image, start_rect_noise, 'blue', 'darkblue', btn_width)
     btn2.pack(pady=10)
 
-    btn3 = create_rounded_button(scrollable_frame, 'Security', btn3_image, start_in_out, 'red', 'darkred')
+    btn3 = create_rounded_button(scrollable_frame, 'Security', btn3_image, start_in_out, 'red', 'darkred', btn_width)
     btn3.pack(pady=10)
 
-    btn4 = create_rounded_button(scrollable_frame, 'Record', btn4_image, start_record, 'purple', 'darkpurple')
+    btn4 = create_rounded_button(scrollable_frame, 'Record', btn4_image, start_record, 'purple', 'darkpurple', btn_width)
     btn4.pack(pady=10)
 
-    btn6 = create_rounded_button(scrollable_frame, 'Monitor', btn6_image, start_noise, 'orange', 'darkorange')
+    btn6 = create_rounded_button(scrollable_frame, 'Monitor', btn6_image, start_noise, 'orange', 'darkorange', btn_width)
     btn6.pack(pady=10)
 
-    btn5 = create_rounded_button(scrollable_frame, 'Exit', btn5_image, popup.destroy, 'black', 'gray')
+    btn5 = create_rounded_button(scrollable_frame, 'Exit', btn5_image, popup.destroy, 'black', 'gray', btn_width)
     btn5.pack(pady=10)
 
     canvas.pack(side='left', fill='both', expand=True)
@@ -91,7 +124,7 @@ def open_popup():
 
 # Create the main window
 window = tk.Tk()
-window.title("Cam-Sys")
+window.title("CCTV - Spy Theme")
 window.iconphoto(False, tk.PhotoImage(file='mn.png'))
 window.geometry('1080x760')
 window.configure(bg='black')  # Set the background color to black
