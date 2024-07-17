@@ -52,7 +52,7 @@ def open_popup(window, btn2_image, btn3_image, btn4_image, btn5_image, btn6_imag
     btn6 = create_rounded_button(scrollable_frame, 'Monitor', btn6_image, start_noise, 'orange', 'darkorange')
     btn6.pack(pady=10)
 
-    btn5 = create_rounded_button(scrollable_frame, 'Exit', btn5_image, popup.destroy, 'black', 'gray')
+    btn5 = create_rounded_button(scrollable_frame, 'Exit', btn5_image, popup.destroy, 'white', 'gray')
     btn5.pack(pady=10)
 
     canvas.pack(side='left', fill='both', expand=True)
