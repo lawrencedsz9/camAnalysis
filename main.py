@@ -3,17 +3,18 @@ import tkinter.font as font
 from PIL import Image, ImageTk, ImageOps
 from threading import Thread
 import sqlite3
+import time
+from datetime import datetime
 from scroll import create_rounded_button, open_popup
 from in_out import in_out
 from motion import noise
 from rect_noise import rect_noise
 from record import record
 
-# Function to connect to the database
+
 def connect_db():
     return sqlite3.connect('setup_database.db')
 
-# Function to create the recordings table if it doesn't exist
 def create_table():
     conn = connect_db()
     cursor = conn.cursor()
@@ -27,10 +28,10 @@ def create_table():
     conn.commit()
     conn.close()
 
-# Call create_table function to ensure the table is created
+
 create_table()
 
-# Function to insert a new recording into the database
+
 def insert_recording(name, timestamp):
     conn = connect_db()
     cursor = conn.cursor()
@@ -38,7 +39,7 @@ def insert_recording(name, timestamp):
     conn.commit()
     conn.close()
 
-# Function to fetch all recordings from the database
+
 def fetch_recordings():
     conn = connect_db()
     cursor = conn.cursor()
@@ -47,7 +48,7 @@ def fetch_recordings():
     conn.close()
     return recordings
 
-# Function to delete a recording from the database
+
 def delete_recording(recording_id):
     conn = connect_db()
     cursor = conn.cursor()
@@ -55,58 +56,75 @@ def delete_recording(recording_id):
     conn.commit()
     conn.close()
 
-# Function to start OpenCV capture for in_out functionality
+
 def start_in_out():
     try:
         Thread(target=in_out).start()
     except Exception as e:
         print(f"Error starting in_out: {e}")
 
-# Function to start OpenCV capture for noise detection
+
 def start_noise():
     try:
         Thread(target=noise).start()
     except Exception as e:
         print(f"Error starting noise detection: {e}")
 
-# Function to start OpenCV capture for recording video
+
 def start_record():
     try:
         Thread(target=record).start()
-        insert_recording('Recording Name', '2024-07-16 12:00:00')  # Example of inserting a recording
+        insert_recording('Recording Name', datetime.now().strftime('%Y-%m-%d %H:%M:%S'))  # Example of inserting a recording
     except Exception as e:
         print(f"Error starting recording: {e}")
 
-# Function to start OpenCV capture for rectangle noise detection
+
 def start_rect_noise():
     try:
         Thread(target=rect_noise).start()
     except Exception as e:
         print(f"Error starting rectangle noise detection: {e}")
 
-# Create the main window
+# Function to update the time label every second
+def update_time():
+    current_time = time.strftime('%I:%M:%S %p')
+    label_time.config(text=current_time)
+    window.after(1000, update_time)
+
+
 window = tk.Tk()
 window.title("Cam-Sys")
 window.iconphoto(False, tk.PhotoImage(file='mn.png'))
-window.geometry('1080x760')
-window.configure(bg='black')  # Set the background color to black
+window.geometry('640x480')  # Set the initial window size
+window.configure(bg='black')  
 
 # Create a frame to hold the widgets
 frame1 = tk.Frame(window, bg='black')
 
-# Title label
+
 label_title = tk.Label(frame1, text="Camera Analysis", fg='lime', bg='black')
 label_font = font.Font(size=35, weight='bold', family='Helvetica')
 label_title['font'] = label_font
-label_title.grid(pady=(10, 10), column=2)
+label_title.grid(pady=(10, 10), column=1, columnspan=3)
+
+
+label_time = tk.Label(frame1, text="", fg='white', bg='black')
+time_font = font.Font(size=30, family='Helvetica')
+label_time['font'] = time_font
+label_time.grid(row=1, pady=(5, 10), column=1, columnspan=3)
+
+
+label_state = tk.Label(frame1, text="State: Recording", fg='white', bg='black')
+state_font = font.Font(size=20, family='Helvetica')
+label_state['font'] = state_font
+label_state.grid(row=2, pady=(5, 10), column=1, columnspan=3)
 
 # Load and resize icons
 icon = Image.open('icons/cam.png').resize((150, 150), Image.LANCZOS)
 icon = ImageTk.PhotoImage(icon)
 label_icon = tk.Label(frame1, image=icon, bg='black')
-label_icon.grid(row=1, pady=(5, 10), column=2)
+label_icon.grid(row=3, pady=(5, 10), column=1, columnspan=3)
 
-# Add hover effect for cam.png
 def on_enter(e):
     label_icon['bg'] = 'gray'
 
@@ -118,10 +136,9 @@ label_icon.bind("<Leave>", on_leave)
 label_icon.bind("<Button-1>", lambda e: open_popup(window, btn2_image, btn3_image, btn4_image, btn5_image, btn6_image,
                                                    start_rect_noise, start_in_out, start_record, start_noise))
 
-# Load button icons and resize
 def load_button_image(image_path):
     img = Image.open(image_path).resize((50, 50), Image.LANCZOS)
-    img = ImageOps.expand(img, border=(25, 25), fill='black')  # Add padding for circular look
+    img = ImageOps.expand(img, border=(25, 25), fill='black')  
     img = ImageTk.PhotoImage(img)
     return img
 
@@ -133,6 +150,8 @@ btn6_image = load_button_image('icons/incognito.png')
 
 # Pack the frame
 frame1.pack(expand=True)
+
+update_time()
 
 # Start the tkinter main loop
 window.mainloop()
