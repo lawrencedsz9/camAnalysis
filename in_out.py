@@ -1,8 +1,10 @@
 import cv2
 import os
 from datetime import datetime
+import tkinter as tk
+from threading import Thread
 
-def in_out():
+def in_out(alert_label):
     cap = cv2.VideoCapture(0)
 
     right, left = "", ""
@@ -53,12 +55,14 @@ def in_out():
                 print("to left")
                 right, left = "", ""
                 cv2.imwrite(f"visitors/in/{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.jpg", frame)
+                alert_label.config(text="Captured: In")
 
         elif left:
             if x > x_threshold_right:
                 print("to right")
                 right, left = "", ""
                 cv2.imwrite(f"visitors/out/{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.jpg", frame)
+                alert_label.config(text="Captured: Out")
 
         cv2.imshow("Frame", frame)
 

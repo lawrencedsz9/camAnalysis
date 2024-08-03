@@ -1,15 +1,15 @@
-# record.py
-
 import cv2
 from datetime import datetime
 import os
 
-def record():
+def record(alert_label):
     cap = cv2.VideoCapture(0)  # Initialize video capture from the first camera
 
     # Define codec and output video file
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
     output_path = 'C:/Users/lawrence/Desktop/pythooon/visitors/recordings/'
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
     output_file = f'{output_path}{datetime.now().strftime("%H-%M-%S")}.avi'
     out = cv2.VideoWriter(output_file, fourcc, 20.0, (640, 480))
 
@@ -32,3 +32,4 @@ def record():
     cap.release()
     out.release()
     cv2.destroyAllWindows()
+    alert_label.config(text="Recording Captured")
