@@ -55,7 +55,7 @@ Cam-Sys/
 ├── haarcascade_frontalface_default.xml
 ├── mn.png                      # Application icon
 └── README.md
-
+```
 ## Requirements 
 
 - Python 3.8+
