@@ -3,7 +3,7 @@
 Cam-Sys is a **Python-based camera analysis and security system** built using **OpenCV** and **Tkinter**.  
 It provides a desktop interface to monitor camera activity, detect motion, track entry/exit direction, and record video with timestamps.
 
-This project was developed as a hands-on exploration of **computer vision**, **real-time video processing**, and **UI-driven system design**.
+This project was developed as a hands-on exploration of **computer vision** and **real-time video processing**.
 
 ---
 
@@ -34,23 +34,24 @@ This project was developed as a hands-on exploration of **computer vision**, **r
 ## Project Structure 
 Cam-Sys/
 │
-├── main.py # Main Tkinter UI and controller
-├── in_out.py # Entry / Exit detection logic
-├── motion.py # Full-frame motion detection
-├── rect_noise.py # Region-based motion detection
-├── record.py # Video recording module
-├── scroll.py # UI helpers and popup controls
-├── setup_database.py # SQLite database setup & indexing
-├── setup_database.db # Local database file
+├── main.py                     # Main Tkinter UI and controller
+├── in_out.py                   # Entry / Exit detection logic
+├── motion.py                   # Full-frame motion detection
+├── rect_noise.py               # Region-based motion detection
+├── record.py                   # Video recording module
+├── scroll.py                   # UI helpers and popup controls
+├── setup_database.py           # SQLite database setup & indexing
+├── setup_database.db           # Local database file
 │
 ├── visitors/
-│ ├── in/ # Captured entry images
-│ ├── out/ # Captured exit images
-│ └── recordings/ # Recorded video files
+│   ├── in/                     # Captured entry images
+│   ├── out/                    # Captured exit images
+│   └── recordings/             # Recorded video files
 │
-├── icons/ # UI icons
+├── icons/                      # UI icons
 ├── haarcascade_frontalface_default.xml
-
+├── mn.png                      # Application icon
+└── README.md
 ## Requirements 🛠️
 
 - Python 3.8+
