@@ -31,7 +31,10 @@ This project was developed as a hands-on exploration of **computer vision** and 
 
 ---
 
-## Project Structure 
+
+## Project Structure 📂
+
+```text
 Cam-Sys/
 │
 ├── main.py                     # Main Tkinter UI and controller
@@ -52,7 +55,8 @@ Cam-Sys/
 ├── haarcascade_frontalface_default.xml
 ├── mn.png                      # Application icon
 └── README.md
-## Requirements 🛠️
+
+## Requirements 
 
 - Python 3.8+
 - OpenCV
